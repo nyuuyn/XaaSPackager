@@ -1,0 +1,8 @@
+<dats>
+	<dat>
+		<serviceTemplate>{http://opentosca.org/declarative/bpel}BPELStack</serviceTemplate>
+		<nodeTemplate>BPEL</nodeTemplate>
+		<artifactType>{http://docs.oasis-open.org/wsbpel/2.0/process/executable}BPEL</artifactType>
+		<deploymentArtifact>BPELProcess</deploymentArtifact>
+	</dat>
+</dats>
