@@ -10,14 +10,14 @@
 <body>
 	<h1>XaaS Packager</h1>
 
-	<h4>Tasks:</h4>
+	<h4>Task</h4>
 	<p>
-		<c:forEach var="task" items="${it.tasks}">
-			ID: <a href="./tasks/${task.id}">${task.id}</a>  <br/>
-			State: ${task.currentState}<br/>
-			Message: ${task.currentMessage}<br/><br/>
-		</c:forEach>
-
+		ID: ${it.id} <br /> 
+		State: ${it.currentState}<br /> 
+		Message: ${it.currentMessage}<br />
+		<c:if test="${it.currentState == 'PACKAGED'}">
+			<a href="./${it.id}/download">Download</a>
+		</c:if>
 	</p>
 
 </body>

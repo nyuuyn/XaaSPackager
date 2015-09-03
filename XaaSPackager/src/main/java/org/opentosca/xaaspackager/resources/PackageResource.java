@@ -2,6 +2,8 @@ package org.opentosca.xaaspackager.resources;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.logging.Logger;
@@ -37,7 +39,7 @@ public class PackageResource {
 			@FormDataParam("file") InputStream uploadedInputStream,
 			@FormDataParam("file") FormDataContentDisposition fileDetail,
 			@FormDataParam("artifactType") QName artifactType)
-			throws IOException {
+			throws IOException, URISyntaxException {
 		LOG.info("Begining to handle FileUpload request of artifactType "
 				+ artifactType);
 		// create temp dir for receiving sent file
@@ -67,10 +69,14 @@ public class PackageResource {
 					.build();
 		}
 
+		
 		PackageTasks.getInstance().tasks.add(newTask);
 
 		new Thread(new PackagerTask(newTask)).start();
 		// TODO redirect to task resource or just return location in header
-		return Response.status(200).entity("upload successful").build();
+		
+		URI newTaskUri = new URI("/XaaSPackager/tasks/" + newTask.getId());
+		return Response.seeOther(newTaskUri).build();
+		//return Response.status(200).entity("upload successful").build();
 	}
 }

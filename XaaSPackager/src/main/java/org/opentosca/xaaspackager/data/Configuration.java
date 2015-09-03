@@ -6,7 +6,7 @@ package org.opentosca.xaaspackager.data;
  */
 public class Configuration {
 
-	private static String wineryAddress = "http://localhost:8080/winery";
+	private static String wineryAddress = "http://dev.winery.opentosca.org/winery/";
 	private static String containerAddress = "http://localhost:1337/container";
 
 	private Configuration() {
