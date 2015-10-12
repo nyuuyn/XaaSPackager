@@ -3,6 +3,7 @@ package org.opentosca.xaaspackager.packager;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
+import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -100,14 +101,15 @@ public class PackagerTask implements Runnable {
 
 				if (nodeTemplateList.getLength() == 1) {
 
-					WebTarget csarResource = serviceTemplateResource.queryParam("csar", "");
+					WebTarget csarResource = serviceTemplateResource
+							.queryParam("csar", "");
 					this.currentState.setCurrentState(PackageState.DOWNLOADING);
 					this.currentState
 							.setCurrentMessage("Beginning to download CSAR from "
 									+ csarResource.getUri());
-					
-					
-					Response csarResourceResponse = csarResource.request().get();										
+
+					Response csarResourceResponse = csarResource.request()
+							.get();
 					InputStream inputStream = (InputStream) csarResourceResponse
 							.getEntity();
 
@@ -167,11 +169,26 @@ public class PackagerTask implements Runnable {
 		this.currentState.setCurrentState(PackageState.PACKAGING);
 		this.currentState.setCurrentMessage("Adding deploymentArtifact");
 
-		String relativeDAPath = "/xaaspackager/" + URLEncoder.encode(artifactType.toString())
-				+ "/"
-				+ this.currentState.getDeploymentArtifactPath().getFileName()
-				+ "/"
-				+ this.currentState.getDeploymentArtifactPath().getFileName();
+		String relativeDAPath = "";
+		String relativeDAPathDoubleEncode = "";
+		try {
+			relativeDAPath = "/xaaspackager/"
+					+ URLEncoder.encode(artifactType.getNamespaceURI(),"UTF-8") + "/"
+					+ artifactType.getLocalPart() + "/"
+					+ this.currentState.getDeploymentArtifactPath().getFileName()
+					+ "/"
+					+ this.currentState.getDeploymentArtifactPath().getFileName();
+			
+			relativeDAPathDoubleEncode = "/xaaspackager/"
+					+ URLEncoder.encode(URLEncoder.encode(artifactType.getNamespaceURI(),"UTF-8"),"UTF-8") + "/"
+					+ artifactType.getLocalPart() + "/"
+					+ this.currentState.getDeploymentArtifactPath().getFileName()
+					+ "/"
+					+ this.currentState.getDeploymentArtifactPath().getFileName();
+		} catch (UnsupportedEncodingException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
 		// copy da into csar temp dir
 		Path daPath = Paths.get(this.currentState.getUnpackedCsarPath()
@@ -256,7 +273,7 @@ public class PackagerTask implements Runnable {
 
 			Node artifactTemplateNode = this
 					.createArtifactTemplateNode(artifactTemplateId,
-							artifactType, Paths.get(relativeDAPath));
+							artifactType, Paths.get(relativeDAPathDoubleEncode));
 
 			artifactTemplateNode = definitionsDoc.importNode(
 					artifactTemplateNode, true);
@@ -314,7 +331,10 @@ public class PackagerTask implements Runnable {
 		try {
 			Path packagingTempDir = Files.createTempDirectory("XaaSPackager");
 			Path packagedCsarFile = Paths.get(packagingTempDir.toString(),
-					serviceTemplate.getLocalPart() + ".csar");
+					serviceTemplate.getLocalPart()
+							+ "_"
+							+ this.currentState.getDeploymentArtifactPath()
+									.getFileName() + ".csar");
 
 			ZipUtil.pack(this.currentState.getUnpackedCsarPath().toFile(),
 					packagedCsarFile.toFile());
@@ -332,6 +352,13 @@ public class PackagerTask implements Runnable {
 	private Node createArtifactTemplateNode(String artifactTemplateId,
 			QName artifactType, Path relativeDAPath) {
 		long id = System.currentTimeMillis();
+		
+		String refPath = relativeDAPath.toString();
+		
+		if(refPath.startsWith("/")){
+			refPath = refPath.substring(1);
+		}
+		
 		String artifactTemplate = "<ArtifactTemplate xmlns=\"http://docs.oasis-open.org/tosca/ns/2011/12\" id=\""
 				+ artifactTemplateId
 				+ "\" xmlns:ns"
@@ -343,7 +370,7 @@ public class PackagerTask implements Runnable {
 				+ ":"
 				+ artifactType.getLocalPart()
 				+ "\"><ArtifactReferences><ArtifactReference reference=\""
-				+ relativeDAPath.toString()
+				+ refPath
 				+ "\"/></ArtifactReferences></ArtifactTemplate>";
 
 		XPathFactory xpathFactory = XPathFactory.newInstance();
