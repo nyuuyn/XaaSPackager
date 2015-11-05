@@ -343,6 +343,11 @@ public class PackagerTask implements Runnable {
 			this.currentState.setCurrentState(PackageState.PACKAGED);
 			this.currentState
 					.setCurrentMessage("CSAR packed and ready. See download link");
+			
+			FileUtils.deleteQuietly(this.currentState.getDeploymentArtifactPath().toFile());			
+			FileUtils.deleteQuietly(this.currentState.getDownloadedCsarPath().toFile());
+			FileUtils.deleteDirectory(this.currentState.getPackedCsarPath().toFile());						
+			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
