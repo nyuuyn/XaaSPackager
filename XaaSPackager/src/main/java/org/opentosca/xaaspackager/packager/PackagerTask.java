@@ -204,7 +204,7 @@ public class PackagerTask implements Runnable {
 			e.printStackTrace();
 		}
 
-		// TODO add artifactTemplate and change DA on NodeTemplate
+		// add artifactTemplate and change DA on NodeTemplate
 		// find serviceTemplate
 		Path toscaMetaPath = Paths.get(this.currentState.getUnpackedCsarPath()
 				.toString() + "/TOSCA-Metadata/TOSCA.meta");
@@ -279,7 +279,7 @@ public class PackagerTask implements Runnable {
 					artifactTemplateNode, true);
 			definitionsElement.appendChild(artifactTemplateNode);
 
-			// fetch deploymentArtifact and change it new artifactTemplate
+			// fetch deploymentArtifact and change it to new artifactTemplate
 			Element deploymentArtifactNode = (Element) xpath.evaluate(this
 					.xpathQueryTargetDA(serviceTemplate, nodeTemplate,
 							artifactType, deploymentArtifact), definitionsDoc,
@@ -334,7 +334,7 @@ public class PackagerTask implements Runnable {
 					serviceTemplate.getLocalPart()
 							+ "_"
 							+ this.currentState.getDeploymentArtifactPath()
-									.getFileName() + ".csar");
+									.getFileName() + System.currentTimeMillis() +".csar");
 
 			ZipUtil.pack(this.currentState.getUnpackedCsarPath().toFile(),
 					packagedCsarFile.toFile());
@@ -346,7 +346,7 @@ public class PackagerTask implements Runnable {
 			
 			FileUtils.deleteQuietly(this.currentState.getDeploymentArtifactPath().toFile());			
 			FileUtils.deleteQuietly(this.currentState.getDownloadedCsarPath().toFile());
-			FileUtils.deleteDirectory(this.currentState.getPackedCsarPath().toFile());						
+			//FileUtils.deleteDirectory(this.currentState.getPackedCsarPath().toFile());						
 			
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
