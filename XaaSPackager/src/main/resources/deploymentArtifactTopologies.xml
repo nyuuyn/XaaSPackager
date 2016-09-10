@@ -6,9 +6,9 @@
 		<deploymentArtifact>BPELProcess</deploymentArtifact>
 	</dat>
 	<dat>
-		<serviceTemplate>{http://opentosca.org/servicetemplates}SmartOrchestra_Demo_ServiceTemplate</serviceTemplate>
+		<serviceTemplate>{http://opentosca.org/servicetemplates}CAiSE2016_Demo_ServiceTemplate</serviceTemplate>
 		<nodeTemplate>PythonApp_2_7</nodeTemplate>
 		<artifactType>{http://docs.oasis-open.org/tosca/ns/2011/12/ToscaBaseTypes}ScriptArtifact</artifactType>
-		<deploymentArtifact>TemperaturePublisher</deploymentArtifact>
+		<deploymentArtifact>TemperaturePublisher_DA</deploymentArtifact>
 	</dat>
 </dats>
