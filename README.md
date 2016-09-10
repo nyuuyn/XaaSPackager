@@ -13,4 +13,4 @@ Deploy on Tomcat, open up {host}:{port}/XaaSPackager
 Eclipse Winery with CSARs
 
 #### Limitations
-Right now basically only the BPELStack.csar is working as under /src/main/resources/deploymentArtifactTopologies.xml only that kind of CSAR is available
+Right now topologies must be specified under /src/main/resources/deploymentArtifactTopologies.xml to make them availabe inside the packager.
