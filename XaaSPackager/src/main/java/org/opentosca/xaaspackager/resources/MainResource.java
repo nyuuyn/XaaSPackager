@@ -28,26 +28,33 @@ public class MainResource {
 	private static final Logger LOG = Logger.getLogger(MainResource.class
 			.getName());
 
+	public class ResponseWrapper{
+		public List<QName> artefactTypes = new ArrayList<QName>();
+		public List<QName> nodeTypes = new ArrayList<QName>();
+		
+		ResponseWrapper(List<QName> artefactTypes, List<QName> nodeTypes){
+			this.artefactTypes = artefactTypes;
+			this.nodeTypes = nodeTypes;
+		}
+	}
+	
 	@GET
 	@Produces(MediaType.TEXT_HTML)
 	public Response root() {
 		LOG.info("Mainpage is requested");
 
-		List<QName> artifactTypes = new ArrayList<QName>();
-
+		List<DeploymentArtifactTopology> dats = new ArrayList<DeploymentArtifactTopology>();
+		
 		try {
-			for (DeploymentArtifactTopology dat : new DATopologyDataSource()
-					.getDATs()) {
-				artifactTypes.add(dat.getArtifactType());
-			}
+			dats.addAll(new DATopologyDataSource().getDATs());
 		} catch (IOException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-
+		
 		return Response.ok(
 				new Viewable("index", new MainResourceDAO(Configuration
-						.getInstance(), artifactTypes))).build();
+						.getInstance(), dats))).build();
 	}
 
 	@Path("/package")

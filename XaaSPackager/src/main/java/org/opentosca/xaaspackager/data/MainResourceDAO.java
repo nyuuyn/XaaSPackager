@@ -3,9 +3,13 @@
  */
 package org.opentosca.xaaspackager.data;
 
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.xml.namespace.QName;
+
+import org.opentosca.xaaspackager.model.DeploymentArtifactTopology;
 
 /**
  * @author nyu
@@ -15,13 +19,14 @@ public class MainResourceDAO {
 
 	public final String wineryAddress;
 	public final String containerAddress;
-	public final List<QName> artifactTypes;
+	public final List<DeploymentArtifactTopology>  dats;
+
 
 	public MainResourceDAO(Configuration configuration,
-			List<QName> artifactTypes) {
+			List<DeploymentArtifactTopology> dats) {
 		this.wineryAddress = configuration.getWineryAddress();
 		this.containerAddress = configuration.getContainerAddress();
-		this.artifactTypes = artifactTypes;
+		this.dats = dats;
 	}
 
 	/**
@@ -39,10 +44,20 @@ public class MainResourceDAO {
 	}
 
 	/**
-	 * @return the artifactTypes
+	 * @return the dats
 	 */
-	public List<QName> getArtifactTypes() {
-		return artifactTypes;
+	public List<DeploymentArtifactTopology> getDats() {
+		return dats;
 	}
-
+	
+	public Set<QName> getAllNodeTypes(){
+		
+		Set<QName> nodeTypes = new HashSet<QName>();
+		
+		for(DeploymentArtifactTopology dat : this.dats){
+			nodeTypes.addAll(dat.getTopologyNodeTypes());
+		}
+		
+		return nodeTypes;
+	}
 }

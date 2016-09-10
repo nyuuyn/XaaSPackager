@@ -6,6 +6,8 @@ import java.net.URI;
 import java.net.URISyntaxException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.List;
+import java.util.Set;
 import java.util.logging.Logger;
 
 import javax.ws.rs.Consumes;
@@ -30,53 +32,42 @@ import org.opentosca.xaaspackager.packager.PackagerTask;
  */
 public class PackageResource {
 
-	private static final Logger LOG = Logger.getLogger(PackageResource.class
-			.getName());
+	private static final Logger LOG = Logger.getLogger(PackageResource.class.getName());
 
 	@POST
 	@Consumes(MediaType.MULTIPART_FORM_DATA)
-	public Response uploadDeploymentArtifact(
-			@FormDataParam("file") InputStream uploadedInputStream,
+	public Response uploadDeploymentArtifact(@FormDataParam("file") InputStream uploadedInputStream,
 			@FormDataParam("file") FormDataContentDisposition fileDetail,
-			@FormDataParam("artifactType") QName artifactType)
+			@FormDataParam("artifactType") QName artifactType, @FormDataParam("nodeTypes") Set<QName> nodeTypes)
 			throws IOException, URISyntaxException {
-		LOG.info("Begining to handle FileUpload request of artifactType "
-				+ artifactType);
+		LOG.info("Begining to handle FileUpload request of artifactType " + artifactType);
 		// create temp dir for receiving sent file
-		java.nio.file.Path downloadTempDir = Files
-				.createTempDirectory("XaaSPackager");
-		java.nio.file.Path downloadedFile = Paths.get(
-				downloadTempDir.toString(), fileDetail.getFileName());
-		FileUtils.copyInputStreamToFile(uploadedInputStream,
-				downloadedFile.toFile());
+		java.nio.file.Path downloadTempDir = Files.createTempDirectory("XaaSPackager");
+		java.nio.file.Path downloadedFile = Paths.get(downloadTempDir.toString(), fileDetail.getFileName());
+		FileUtils.copyInputStreamToFile(uploadedInputStream, downloadedFile.toFile());
 
 		// TODO we should make some checks on the file e.g. file ending, maybe
 		// contents. May greatly increase complexity of DAT however.
 
 		PackageTaskState newTask = null;
 
-		for (DeploymentArtifactTopology dat : new DATopologyDataSource()
-				.getDATs()) {
-			if (dat.getArtifactType().equals(artifactType)) {
+		for (DeploymentArtifactTopology dat : new DATopologyDataSource().getDATs()) {
+			if (dat.getArtifactType().equals(artifactType) && (dat.getTopologyNodeTypes().containsAll(nodeTypes) | nodeTypes.isEmpty())) {
 				newTask = new PackageTaskState(downloadedFile, dat);
 			}
 		}
 
 		if (newTask == null) {
-			return Response
-					.serverError()
-					.entity("Couldn't find Topology for requested artifactType")
-					.build();
+			return Response.serverError().entity("Couldn't find Topology for requested artifactType").build();
 		}
 
-		
 		PackageTasks.getInstance().tasks.add(newTask);
 
 		new Thread(new PackagerTask(newTask)).start();
 		// TODO redirect to task resource or just return location in header
-		
+
 		URI newTaskUri = new URI("/XaaSPackager/tasks/" + newTask.getId());
 		return Response.seeOther(newTaskUri).build();
-		//return Response.status(200).entity("upload successful").build();
+		// return Response.status(200).entity("upload successful").build();
 	}
 }

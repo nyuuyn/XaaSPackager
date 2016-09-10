@@ -1,9 +1,12 @@
 package org.opentosca.xaaspackager.model;
 
+import java.util.List;
+import java.util.Set;
+
 import javax.xml.namespace.QName;
 
 /**
- * @author Kálmán Képes - kepeskn@studi.informatik.uni-stuttgart.de
+ * @author Kálmán Képes - kalman.kepes@iaas.uni-stuttgart.de
  *
  */
 public class DeploymentArtifactTopology {
@@ -12,13 +15,15 @@ public class DeploymentArtifactTopology {
 	private String nodeTemplate;
 	private QName artifactType;
 	private String deploymentArtifact;
+	private Set<QName> topologyNodeTypes;
 
 	public DeploymentArtifactTopology(QName serviceTemplate,
-			String nodeTemplate, QName artifactType, String deploymentArtifact) {
+			String nodeTemplate, QName artifactType, String deploymentArtifact, Set<QName> topologyNodeTypes) {
 		this.serviceTemplate = serviceTemplate;
 		this.nodeTemplate = nodeTemplate;
 		this.artifactType = artifactType;
 		this.deploymentArtifact = deploymentArtifact;
+		this.topologyNodeTypes = topologyNodeTypes;
 	}
 
 	/**
@@ -49,4 +54,10 @@ public class DeploymentArtifactTopology {
 		return deploymentArtifact;
 	}
 
+	/**
+	 * @return the toplogyNodeTypes
+	 */
+	public Set<QName> getTopologyNodeTypes() {
+		return topologyNodeTypes;
+	}
 }
